@@ -1,3 +1,7 @@
+---
+layout: post
+title: Alchemyd Entities API sample code
+---
 Alchemy API enalbes you to extract entities from text or website.
 Here's sample code. Before using this API, you need to get login to Alchemy API site and get app key.
  
