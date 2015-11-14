@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Alchemyd Entities API sample code
+title: Alchemy Entities API sample code
 ---
 Alchemy API enalbes you to extract entities from text or website.
 Here's sample code. Before using this API, you need to get login to Alchemy API site and get app key.
@@ -10,7 +10,7 @@ Sample text are quoted from "PayPal Holdings to Ring The Nasdaq Stock Market Ope
 English, French, German, Italy, Portuguese, Russian, Spanish and Swedish languages are supported.
 
 
-
+~~~~
 $APPKEY="YOUR APP KEY";
 
 $txt="Digital payments leader PayPal Holdings, Inc. (Nasdaq:PYPL) will visit the Nasdaq MarketSite in Times Square in celebration of the companys return to being an independent, publicly traded company under its original ticker symbol PYPL.";
@@ -36,7 +36,7 @@ $result = curl_exec($curl);
 curl_close($curl);
 
 print $result;
-
+~~~~
  
 
  
