@@ -11,6 +11,8 @@ To get more information about azure machine learning, visit below.
 
 Here's sample code .
 Send text and get sentiment score.
+
+
 ~~~~
 $accountKey = "YOURE APP ID";
 $text = "Do you wanna hurt me?";//put your text here.
