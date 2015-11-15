@@ -1,0 +1,40 @@
+---
+layout: post
+title: How to get Bitcoin Price Index via API
+---
+CoinDesk offers BPI(Bitcoin Price Index). 
+
+You can get BPI via <a href="http://www.coindesk.com/api/">CoinDesk Bitcoin Price Index API</a>.
+
+Here's a sample PHP code.
+
+
+~~~~
+
+$f="https://api.coindesk.com/v1/bpi/currentprice.json";
+
+$file=file_get_contents($f);
+if($file==""){
+	print("error:cant get file");
+	return;
+}
+$myjson = json_decode($file);
+print "&lt;li&gt;BPI:".$myjson-&gt;bpi-&gt;USD-&gt;rate;
+print "&lt;li&gt;disclaimer:".$myjson-&gt;disclaimer;
+
+
+~~~~
+
+
+Output is like this:
+~~~~
+BPI:674.1900
+disclaimer:This data was produced from the CoinDesk Bitcoin Price Index. Non-USD currency data converted using hourly conversion rate from openexchangerates.org
+~~~~
+
+
+<font size="4" color="red"><B>You have your own blog but don't do programming?</B></font>
+
+No problem. 
+
+Coindesk has BPI widget. You can get code and put it onto you blog.(<a href="http://www.coindesk.com/bitcoin-price-ticker-available/">CoinDesk Real-Time Bitcoin Price Ticker Now Available</a>)
