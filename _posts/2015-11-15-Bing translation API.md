@@ -1,8 +1,8 @@
 ---
 layout: post
-title: PHP Sample code:Bing translation API
+title: Bing translation API sample code
 ---
-<h2>What's Bing translation API</h2>
+
 Microsoft Bing offers translation API.
 WIth it, you can translate English text into Japanese, or Japanese text into English.
 Translations is not perfect, but not bad.
