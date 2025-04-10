@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>akYip's Color Vision Test</title>
+    <title>akYip's Typing Speed Test</title>
     <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap" rel="stylesheet">
     <style>
         body {
@@ -44,7 +44,10 @@
             color: #666;
             cursor: not-allowed;
         }
-        input {
+        textarea {
+            width: 80%;
+            max-width: 500px;
+            height: 100px;
             padding: 10px;
             margin: 10px;
             border: 2px solid #00d4ff;
@@ -52,6 +55,16 @@
             background-color: #16213e;
             color: #00d4ff;
             font-size: 1em;
+            resize: none;
+        }
+        #sentence {
+            font-size: 1.3em;
+            color: #e94560;
+            background: rgba(22, 33, 62, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px auto;
+            max-width: 500px;
         }
         #result {
             margin-top: 20px;
@@ -71,122 +84,105 @@
             box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
             display: inline-block;
         }
-        canvas {
-            border: 2px solid #e94560;
-            border-radius: 10px;
-            background-color: #16213e;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>⚡ akYip's Color Vision Test ⚡</h1>
-        <p>Enter the number you see on the canvas!</p>
-        <canvas id="colorCanvas" width="300" height="300"></canvas>
+        <h1>⚡ akYip's Typing Speed Test ⚡</h1>
+        <p>Type the sentence below as fast as you can!</p>
+        <div id="sentence"></div>
+        <textarea id="userInput" placeholder="Start typing here..." disabled></textarea>
         <br>
         <button id="startBtn">Start Test 🌩️</button>
-        <br>
-        <input type="text" id="userInput" placeholder="Enter the number you see" disabled>
-        <button id="submitBtn" disabled>Submit 🎨</button>
         <div id="result"></div>
     </div>
 
     <script>
-        // Canvas setup
-        const canvas = document.getElementById("colorCanvas");
-        const ctx = canvas.getContext("2d");
-
         // DOM elements
         const startBtn = document.getElementById("startBtn");
-        const submitBtn = document.getElementById("submitBtn");
         const userInput = document.getElementById("userInput");
+        const sentenceDiv = document.getElementById("sentence");
         const resultDiv = document.getElementById("result");
 
-        // Test data: {number, background color, number color}
-        const tests = [
-            { number: "12", bg: "#ff0000", numColor: "#00ff00" }, // Red bg, green number (red-green colorblindness)
-            { number: "8", bg: "#00ff00", numColor: "#ff0000" },  // Green bg, red number
-            { number: "5", bg: "#0000ff", numColor: "#ffff00" }   // Blue bg, yellow number
+        // Sample sentences
+        const sentences = [
+            "The quick brown fox jumps over the lazy dog.",
+            "A journey of a thousand miles begins with a single step.",
+            "Typing fast is a skill that improves with practice.",
+            "Rainy days are perfect for staying inside and coding.",
+            "The stars shine brightly in the clear night sky."
         ];
-        let currentTest = 0;
-        let correctAnswers = 0;
 
-        // Draw circles with number
-        function drawTest(test) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = test.bg;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Random circles for noise
-            for (let i = 0; i < 100; i++) {
-                const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height;
-                const r = Math.random() * 10 + 5;
-                ctx.beginPath();
-                ctx.arc(x, y, r, 0, Math.PI * 2);
-                ctx.fillStyle = `hsl(${Math.random() * 360}, 70%, 50%)`;
-                ctx.fill();
-            }
-
-            // Draw the number
-            ctx.font = "80px Mochiy Pop P One";
-            ctx.fillStyle = test.numColor;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(test.number, canvas.width / 2, canvas.height / 2);
-        }
+        let startTime, endTime, targetSentence;
 
         // Start test
         startBtn.addEventListener("click", () => {
-            currentTest = 0;
-            correctAnswers = 0;
             startBtn.disabled = true;
             userInput.disabled = false;
-            submitBtn.disabled = false;
             userInput.value = "";
             resultDiv.innerHTML = "";
-            drawTest(tests[currentTest]);
+
+            // Select random sentence
+            targetSentence = sentences[Math.floor(Math.random() * sentences.length)];
+            sentenceDiv.textContent = targetSentence;
+
+            // Focus on textarea and start timer
+            userInput.focus();
+            startTime = null;
+
+            // Start timer on first keypress
+            userInput.addEventListener("input", startTimer, { once: true });
         });
 
-        // Submit answer
-        submitBtn.addEventListener("click", () => {
-            const userAnswer = userInput.value.trim();
-            const correctAnswer = tests[currentTest].number;
+        // Start timer on first input
+        function startTimer() {
+            startTime = performance.now();
+            userInput.addEventListener("input", checkCompletion);
+        }
 
-            if (userAnswer === correctAnswer) {
-                correctAnswers++;
+        // Check if typing is complete
+        function checkCompletion() {
+            if (userInput.value.trim() === targetSentence) {
+                endTime = performance.now();
+                userInput.removeEventListener("input", checkCompletion);
+                calculateResult();
             }
+        }
 
-            currentTest++;
-            userInput.value = "";
+        // Calculate and display result
+        function calculateResult() {
+            const timeTaken = (endTime - startTime) / 1000; // Seconds
+            const words = targetSentence.split(" ").length;
+            const wpm = Math.round((words / timeTaken) * 60); // Words per minute
 
-            if (currentTest < tests.length) {
-                drawTest(tests[currentTest]);
-            } else {
-                endTest();
+            // Calculate accuracy
+            const typedWords = userInput.value.trim().split(" ");
+            let correctChars = 0;
+            for (let i = 0; i < targetSentence.length; i++) {
+                if (targetSentence[i] === userInput.value[i]) {
+                    correctChars++;
+                }
             }
-        });
+            const accuracy = Math.round((correctChars / targetSentence.length) * 100);
 
-        // End test and show result
-        function endTest() {
-            startBtn.disabled = false;
-            userInput.disabled = true;
-            submitBtn.disabled = true;
+            // Result message
             let message = "";
             let postText = "";
-            if (correctAnswers === tests.length) {
-                message = "🎉 Perfect! Your color vision seems normal!<br>";
-                postText = "I aced akYip's Color Vision Test! My color vision is spot on! 🎉 #ColorVisionTest";
-            } else if (correctAnswers > 0) {
-                message = `⚠️ You got ${correctAnswers} out of ${tests.length} correct.<br>You might have trouble with some colors!<br>`;
-                postText = `I got ${correctAnswers}/${tests.length} on akYip's Color Vision Test. Some colors are tricky! ⚠️ #ColorVisionTest`;
+            if (wpm >= 60 && accuracy >= 90) {
+                message = `🎉 Awesome! ${wpm} WPM with ${accuracy}% accuracy!<br>You’re a typing pro!<br>`;
+                postText = `I scored ${wpm} WPM with ${accuracy}% accuracy on akYip's Typing Speed Test! Pro level! 🎉 #TypingSpeedTest`;
+            } else if (wpm >= 40 && accuracy >= 80) {
+                message = `⚡ Nice! ${wpm} WPM with ${accuracy}% accuracy!<br>Pretty solid skills!<br>`;
+                postText = `I got ${wpm} WPM with ${accuracy}% accuracy on akYip's Typing Speed Test! Solid stuff! ⚡ #TypingSpeedTest`;
             } else {
-                message = "🚨 You didn’t see any numbers…<br>Consider a color vision check!<br>";
-                postText = "I couldn’t see any numbers on akYip's Color Vision Test… Time for a check-up? 🚨 #ColorVisionTest";
+                message = `🎵 Keep Going! ${wpm} WPM with ${accuracy}% accuracy.<br>Practice makes perfect!<br>`;
+                postText = `I hit ${wpm} WPM with ${accuracy}% accuracy on akYip's Typing Speed Test. Time to practice! 🎵 #TypingSpeedTest`;
             }
             message += '<button id="restartBtn">Restart Test 🔄</button><br>' +
                       '<button id="postBtn">Post to X 📢</button>';
             resultDiv.innerHTML = message;
+            startBtn.disabled = false;
+            userInput.disabled = true;
 
             // Restart button
             document.getElementById("restartBtn").addEventListener("click", () => {
@@ -195,7 +191,7 @@
 
             // Post to X button
             document.getElementById("postBtn").addEventListener("click", () => {
-                const url = "https://akyip-color-vision-test.example.com"; // Replace with your actual URL
+                const url = "https://akyip-typing-speed-test.example.com"; // Replace with your actual URL
                 const tweet = encodeURIComponent(postText + " " + url);
                 window.open(`https://twitter.com/intent/tweet?text=${tweet}`, '_blank');
             });
