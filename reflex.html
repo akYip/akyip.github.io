@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>akYip's Reflex Sound Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Mochiy Pop P One', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            text-align: center;
+            padding: 50px;
+            color: #00d4ff;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #00d4ff;
+        }
+        p {
+            font-size: 1.2em;
+            color: #e94560;
+        }
+        button {
+            padding: 12px 25px;
+            margin: 10px;
+            border: 2px solid #00d4ff;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #16213e;
+            color: #00d4ff;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: scale(1.05);
+            background-color: #00d4ff;
+            color: #16213e;
+            box-shadow: 0 0 15px #00d4ff;
+        }
+        button:disabled {
+            background-color: #333;
+            border-color: #666;
+            color: #666;
+            cursor: not-allowed;
+        }
+        #reactBtn {
+            padding: 20px 40px;
+            font-size: 1.2em;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: #00d4ff;
+            background: rgba(22, 33, 62, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            display: inline-block;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+        .container {
+            background: rgba(10, 10, 20, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+    	<img src=img/reflex_icon.png><BR>
+        <h1>⚡ akYip's Reflex Sound Test ⚡</h1>
+        <p>Press the button as soon as you hear a sound!</p>
+        <button id="startBtn">Start Test 🌩️</button>
+        <br>
+        <button id="reactBtn" disabled>React! 🎵</button>
+        <BR>
+        <div id="result"></div>
+        <BR><BR><a href=index.html>Back to menu</a>
+    </div>
+
+    <script>
+        // AudioContext setup
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // DOM elements
+        const startBtn = document.getElementById("startBtn");
+        const reactBtn = document.getElementById("reactBtn");
+        const resultDiv = document.getElementById("result");
+
+        // Test parameters
+        const totalRounds = 5; // Number of sounds to test
+        let currentRound = 0;
+        let reactionTimes = [];
+        let soundTime;
+
+        // Play a single beep
+        function playBeep() {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = "sine";
+            oscillator.frequency.setValueAtTime(440 + Math.random() * 660, audioCtx.currentTime); // Random pitch between 440-1100Hz
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.1); // 100ms duration
+            soundTime = performance.now();
+        }
+
+        // Start test
+        startBtn.addEventListener("click", () => {
+            startBtn.disabled = true;
+            reactBtn.disabled = false;
+            resultDiv.innerHTML = "";
+            currentRound = 0;
+            reactionTimes = [];
+            scheduleNextSound();
+        });
+
+        // Schedule a random delay for the next sound
+        function scheduleNextSound() {
+            if (currentRound < totalRounds) {
+                const delay = Math.random() * 2000 + 1000; // 1-3 seconds
+                setTimeout(() => {
+                    playBeep();
+                    reactBtn.focus();
+                }, delay);
+            } else {
+                endTest();
+            }
+        }
+
+        // Record reaction time
+        reactBtn.addEventListener("click", () => {
+            if (soundTime) {
+                const reactionTime = performance.now() - soundTime;
+                reactionTimes.push(reactionTime);
+                soundTime = null;
+                currentRound++;
+                scheduleNextSound();
+            }
+        });
+
+        // End test and evaluate
+        function endTest() {
+            startBtn.disabled = false;
+            reactBtn.disabled = true;
+
+            // Calculate average reaction time
+            const avgReactionTime = Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length);
+
+            // Result message
+            let message = "";
+            let postText = "";
+            if (avgReactionTime <= 250) {
+                message = `🎉 Lightning Fast! Average reaction: ${avgReactionTime}ms!<br>You’ve got reflexes like a pro!<br>`;
+                postText = `I averaged ${avgReactionTime}ms on akYip's Reflex Sound Test! Lightning fast! 🎉 #ReflexSoundTest`;
+            } else if (avgReactionTime <= 400) {
+                message = `⚡ Great Job! Average reaction: ${avgReactionTime}ms!<br>Solid reflexes!<br>`;
+                postText = `I got ${avgReactionTime}ms on akYip's Reflex Sound Test! Pretty quick! ⚡ #ReflexSoundTest`;
+            } else {
+                message = `🎵 Keep Practicing! Average reaction: ${avgReactionTime}ms.<br>You can get faster!<br>`;
+                postText = `I scored ${avgReactionTime}ms on akYip's Reflex Sound Test. Time to sharpen up! 🎵 #ReflexSoundTest`;
+            }
+            message += '<button id="restartBtn">Restart Test 🔄</button><br>' +
+                      '<button id="postBtn">Post to X 📢</button>';
+            resultDiv.innerHTML = message;
+
+            // Restart button
+            document.getElementById("restartBtn").addEventListener("click", () => {
+                startBtn.click();
+            });
+
+            // Post to X button
+            document.getElementById("postBtn").addEventListener("click", () => {
+                const url = "https://akyip.github.io/reflex.html"; // Replace with your actual URL
+                const tweet = encodeURIComponent(postText + " " + url);
+                window.open(`https://twitter.com/intent/tweet?text=${tweet}`, '_blank');
+            });
+        }
+    </script>
+</body>
+</html>

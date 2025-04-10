@@ -70,8 +70,8 @@
 <body>
     <div class="container">
     	<img src=img/agecheck_icon.png><BR>
-        <h1>akYip's Age Hearing Test</h1>
-        <p>Can you hear the sound? Test your ears!</p>
+        <h1> akYip's Age Hearing Test</h1>
+        <p>Listen to the sound and test your hearing ability!</p>
         <p>Current Frequency: <span id="currentFreq">Not Started</span> Hz</p>
         <button id="startBtn">Start Test 🌩️</button>
         <br>
@@ -79,7 +79,6 @@
         <button id="noBtn" disabled>No, I don’t! 🚫</button>
         <BR>
         <div id="result"></div>
-        
         <BR><BR><a href=index.html>Back to menu</a>
     </div>
 
@@ -98,6 +97,7 @@
         ];
 
         let currentStep = 0;
+        let currentResult = "";
 
         // DOM elements
         const startBtn = document.getElementById("startBtn");
@@ -129,6 +129,7 @@
         // Start test
         startBtn.addEventListener("click", () => {
             currentStep = 0;
+            currentResult = "";
             startBtn.disabled = true;
             yesBtn.disabled = false;
             noBtn.disabled = false;
@@ -150,15 +151,8 @@
         // "Yes" button - Show age and end test
         yesBtn.addEventListener("click", () => {
             const { freq, age } = frequencySteps[currentStep];
-            stopSound();
-            resultDiv.innerHTML = `🎉 You heard ${freq}Hz!<br>Your age might be: ${age}<br><button id="restartBtn">Restart Test 🔄</button>`;
-            startBtn.disabled = false;
-            yesBtn.disabled = true;
-            noBtn.disabled = true;
-            currentFreqSpan.textContent = "Not Started";
-            document.getElementById("restartBtn").addEventListener("click", () => {
-                startBtn.click();
-            });
+            currentResult = `I heard ${freq}Hz! My age might be: ${age}`;
+            endTest(currentResult);
         });
 
         // "No" button - Move to next frequency
@@ -167,16 +161,25 @@
             playNextFrequency();
         });
 
-        // End test
+        // End test and add "Post to X" button
         function endTest(message) {
             stopSound();
             startBtn.disabled = false;
             yesBtn.disabled = true;
             noBtn.disabled = true;
             currentFreqSpan.textContent = "Not Started";
-            resultDiv.innerHTML = `${message}<br><button id="restartBtn">Restart Test 🔄</button>`;
+            resultDiv.innerHTML = `${message}<br><button id="restartBtn">Restart Test 🔄</button><br><button id="postBtn">Post to X ✈️</button>`;
+            
+            // Restart button functionality
             document.getElementById("restartBtn").addEventListener("click", () => {
                 startBtn.click();
+            });
+
+            // Post to X button functionality
+            document.getElementById("postBtn").addEventListener("click", () => {
+                const tweetText = encodeURIComponent(`${currentResult} - Tested with akYip's Age Hearing Test! #HearingTest #akYip`);
+                const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+                window.open(tweetUrl, "_blank");
             });
         }
     </script>

@@ -15,7 +15,6 @@
         h1 {
             font-size: 2.5em;
             color: #00d4ff;
-            text-shadow: 0 0 10px #00d4ff, 0 0 20px #00d4ff;
         }
         p {
             font-size: 1.2em;
@@ -75,13 +74,16 @@
 </head>
 <body>
     <div class="container">
+    	<img src=img/breathing_icon.png><BR>
         <h1>⚡ akYip's Breathing Rate Tracker ⚡</h1>
         <p>Tap the button each time you inhale for 30 seconds!</p>
         <div id="timer">30</div>
         <button id="startBtn">Start Test 🌩️</button>
         <br>
         <button id="tapBtn" disabled>Tap on Inhale 🌬️</button>
+        <BR>
         <div id="result"></div>
+        <BR><BR><a href=index.html>Back to menu</a>
     </div>
 
     <script>
@@ -157,7 +159,7 @@
 
             // Post to X button
             document.getElementById("postBtn").addEventListener("click", () => {
-                const url = "https://akyip-breathing-rate-test.example.com"; // Replace with your actual URL
+                const url = "https://akyip.github.io/breathing.html"; // Replace with your actual URL
                 const tweet = encodeURIComponent(postText + " " + url);
                 window.open(`https://twitter.com/intent/tweet?text=${tweet}`, '_blank');
             });
